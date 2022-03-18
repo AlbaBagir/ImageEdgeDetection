@@ -5,24 +5,32 @@ import matplotlib.pyplot as plt
 from numpy import array
 from numpy.linalg import norm
 
-img = cv2.imread('Flower.jpg') #read image
-img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB) #get original image
-gray_image = cv2.imread('Flower.jpg',0) #
+gray_image = cv2.imread('Flower.jpg',0) #get gray_scale image
 
-dx = cv2.Sobel(gray_image,cv2.CV_64F,1,0,3)
-dy = cv2.Sobel(gray_image,cv2.CV_64F,0,1,3)
+#read image as an array
+img1 = array(gray_image)
 
-plt.subplot(1,4,1), plt.imshow(img), plt.title("Original image")
-plt.subplot(1,4,2), plt.imshow(gray_image,cmap="gray"), plt.title("Gray Scale image")
-plt.subplot(1,4,3), plt.imshow(dx,cmap="gray"), plt.title("dx")
-plt.subplot(1,4,4), plt.imshow(dy,cmap="gray"), plt.title("dy")
+#central difference formula f()
+def centralDifference(image, h):
+    img = image.astype(float)
+    dx = (img[h:-h, 2*h:] - img[h:-h, 0:-2*h]) / (2*h)
+    dy = (img[2*h:, h:-h] - img[0:-2*h, h:-h]) / (2*h) 
+    img_lst = []
+    img_lst.append(dx)
+    img_lst.append(dy)
+    norm = np.sqrt(dx**2 + dy**2)
+    img_lst.append(norm)
+    return img_lst
 
-dxNorm = array(dx)
-dyNorm = array(dy)
+fig, img_lst = plt.subplots(1, 3) 
+imgs = centralDifference(img1, 1)
+img_lst[0].imshow(imgs[0], cmap="gray")
+img_lst[1].imshow(imgs[1], cmap="gray")
+img_lst[2].imshow(imgs[2], cmap="gray")
+img_lst[0].set_title('dx')
+img_lst[1].set_title('dy')
+img_lst[2].set_title('norm')
 
-l2dx = norm(dxNorm)
-l2dy = norm(dyNorm)
 
-print (l2dx, l2dy)
 
 plt.show()
